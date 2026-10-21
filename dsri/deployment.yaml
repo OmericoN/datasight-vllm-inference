@@ -6,6 +6,9 @@ metadata:
     app: datasight-vllm-gpu
 spec:
   replicas: 0
+  strategy:
+    type: Recreate
+  progressDeadlineSeconds: 2400
   selector:
     matchLabels:
       app: datasight-vllm-gpu
@@ -17,8 +20,8 @@ spec:
       serviceAccountName: anyuid
       containers:
         - name: vllm
-          image: image-registry.openshift-image-registry.svc:5000/ub-datasight/datasight-vllm-gpu:latest
-          imagePullPolicy: Always
+          image: image-registry.openshift-image-registry.svc:5000/ub-ub-datasight/datasight-vllm-gpu:qwen3.8-27b-v1
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           env:
@@ -27,11 +30,13 @@ spec:
             - name: PORT
               value: "8000"
             - name: VLLM_MODEL
-              value: Qwen/Qwen2.5-0.5B-Instruct
+              value: Qwen/Qwen3.8-27B
+            - name: VLLM_REVISION
+              value: 1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0
             - name: SERVED_MODEL_NAME
-              value: Qwen/Qwen2.5-0.5B-Instruct
+              value: Qwen/Qwen3.8-27B
             - name: VLLM_DTYPE
-              value: auto
+              value: bfloat16
             - name: VLLM_START_MODE
               value: serve
             - name: HF_HOME
@@ -81,10 +86,12 @@ spec:
             requests:
               cpu: "4"
               memory: 32Gi
+              ephemeral-storage: 2Gi
               nvidia.com/gpu: "1"
             limits:
               cpu: "16"
               memory: 128Gi
+              ephemeral-storage: 10Gi
               nvidia.com/gpu: "1"
       volumes:
         - name: hf-cache

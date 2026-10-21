@@ -1,4 +1,4 @@
-FROM vllm/vllm-openai:latest
+FROM vllm/vllm-openai:v0.32.0-cu129
 
 ENV HF_HOME=/hf-cache
 ENV HUGGINGFACE_HUB_CACHE=/hf-cache/hub
@@ -10,16 +10,16 @@ ENV TORCHINDUCTOR_CACHE_DIR=/hf-cache/torchinductor
 ENV HOME=/tmp
 ENV USER=datasight
 ENV LOGNAME=datasight
-ENV VLLM_MODEL=Qwen/Qwen2.5-0.5B-Instruct
-ENV SERVED_MODEL_NAME=Qwen/Qwen2.5-0.5B-Instruct
+ENV VLLM_MODEL=Qwen/Qwen3.8-27B
+ENV VLLM_REVISION=1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0
 ENV HOST=0.0.0.0
 ENV PORT=8000
-ENV VLLM_DTYPE=auto
+ENV VLLM_DTYPE=bfloat16
 ENV VLLM_START_MODE=serve
 
 COPY entrypoint-vllm.sh /entrypoint-vllm.sh
-RUN mkdir -p /hf-cache /tmp/hf-cache /tmp/xdg-cache /tmp/vllm-cache \
-  && chmod 0777 /hf-cache /tmp/hf-cache /tmp/xdg-cache /tmp/vllm-cache \
+RUN mkdir -p /hf-cache \
+  && chmod 0777 /hf-cache \
   && chmod +x /entrypoint-vllm.sh
 
 EXPOSE 8000
