@@ -20,7 +20,7 @@ spec:
       serviceAccountName: anyuid
       containers:
         - name: vllm
-          image: image-registry.openshift-image-registry.svc:5000/ub-ub-datasight/datasight-vllm-gpu:qwen3.8-27b-v1
+          image: image-registry.openshift-image-registry.svc:5000/ub-ub-datasight/datasight-vllm-gpu:qwen3.8-27b-v2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

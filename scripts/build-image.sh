@@ -2,7 +2,7 @@
 set -eu
 
 registry=image-registry.openshift-image-registry.svc:5000
-target="${registry}/${NAMESPACE}/datasight-vllm-gpu:qwen3.8-27b-v1"
+target="${registry}/${NAMESPACE}/datasight-vllm-gpu:qwen3.8-27b-v2"
 export HOME=/tmp
 export DOCKER_CONFIG=/tmp/docker
 mkdir -p "$DOCKER_CONFIG" /tmp/layer/hf-cache

@@ -128,8 +128,8 @@ class EntrypointTests(unittest.TestCase):
         result = self.invoke(script=script_path)
         self.assertEqual(result.returncode, 0, result.stderr)
         args = self.capture.read_text().splitlines()
-        self.assertIn("docker.io/vllm/vllm-openai:v0.32.0-cu129", args)
-        self.assertIn("image-registry.openshift-image-registry.svc:5000/test-namespace/datasight-vllm-gpu:qwen3.8-27b-v1", args)
+        self.assertIn("docker.io/vllm/vllm-openai:v0.32.0", args)
+        self.assertIn("image-registry.openshift-image-registry.svc:5000/test-namespace/datasight-vllm-gpu:qwen3.8-27b-v2", args)
         self.assertNotIn("fake-test-token", self.capture.read_text() + result.stdout + result.stderr)
         for line in (ROOT / "Dockerfile").read_text().splitlines():
             if line.startswith("ENV "):

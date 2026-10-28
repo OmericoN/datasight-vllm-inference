@@ -26,7 +26,8 @@ def request_json(base_url, path, token, timeout, payload=None):
     request = Request(base_url + path, data=body, headers=headers)
     try:
         with urlopen(request, timeout=timeout) as response:
-            return response.status, json.load(response)
+            body = response.read()
+            return response.status, json.loads(body) if body else None
     except HTTPError as exc:
         # Never print upstream bodies: they can contain prompts or credentials.
         with exc:

@@ -53,6 +53,11 @@ class SmokeTests(unittest.TestCase):
                 if owner.scenario == "timeout":
                     time.sleep(0.1)
                 encoded = b"not JSON" if owner.scenario == "invalid_json" else json.dumps(body).encode()
+                if (owner.scenario, self.path) in {
+                    ("empty_health", "/health"), ("empty_models", "/v1/models"),
+                    ("empty_completion", "/v1/chat/completions"),
+                }:
+                    encoded = b""
                 self.send_response(status)
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(encoded)))
@@ -90,6 +95,11 @@ class SmokeTests(unittest.TestCase):
         self.check(expect_unavailable=True)
         self.assertEqual([r[0] for r in self.requests], ["/health", "/v1/chat/completions"])
 
+    def test_empty_health_response(self):
+        self.scenario = "empty_health"
+        self.check()
+        self.assertEqual(self.requests[-1][0], "/v1/chat/completions")
+
     def test_failures_identify_stage(self):
         for scenario, stage in [
             ("auth", "/v1/models"), ("wrong_model", "/v1/models"),
@@ -97,6 +107,7 @@ class SmokeTests(unittest.TestCase):
             ("invalid_json", "/health"), ("invalid_content", "/v1/chat/completions"),
             ("truncated", "/v1/chat/completions"), ("invented_evidence", "/v1/chat/completions"),
             ("unavailable", "/v1/chat/completions"),
+            ("empty_models", "/v1/models"), ("empty_completion", "/v1/chat/completions"),
         ]:
             with self.subTest(scenario=scenario):
                 self.scenario = scenario

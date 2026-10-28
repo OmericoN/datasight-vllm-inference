@@ -9,8 +9,8 @@ configured for DSRI project `ub-ub-datasight`; verify live access before applyin
 
 - Model/served name: `Qwen/Qwen3.8-27B`
 - Model and tokenizer revision: `1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0`
-- Base image: `vllm/vllm-openai:v0.32.0-cu129` (CUDA 12.9)
-- Custom image tag: `datasight-vllm-gpu:qwen3.8-27b-v1`
+- Base image: `vllm/vllm-openai:v0.32.0` (CUDA 13.0)
+- Custom image tag: `datasight-vllm-gpu:qwen3.8-27b-v2`
 - BF16, one GPU, tensor parallelism 1, 16,384-token context (input plus output),
   one active sequence, GPU memory utilization 0.90, text only.
 - Thinking disabled by default; callers can override with
@@ -23,7 +23,7 @@ These are initial settings for an H100/A100 80 GB, not a measured capacity or
 performance guarantee. Confirm the actual GPU, NVIDIA driver/CUDA compatibility,
 quota, storage permissions, and inference during a booked session.
 
-Prepared on 2026-10-21 in `ub-ub-datasight`:
+Initial CPU preparation on 2026-10-21 in `ub-ub-datasight` (v1 image):
 
 - CPU image assembly, model download, and independent offline verification Jobs completed.
 - Published image digest: `sha256:c0172fca44326b3394bc07713b8ddb610413bdcb20700e85d911ad29346a2011`.
@@ -33,6 +33,29 @@ Prepared on 2026-10-21 in `ub-ub-datasight`:
   mount, including each weight shard's header and expected file size.
 - GPU Deployment remains at **zero replicas**; no GPU was consumed.
 - All 14 local tests passed. GPU model loading and inference remain untested.
+
+GPU startup on 2026-10-28 exposed a dependency mismatch in the v1 CUDA 12.9
+image: TorchCodec 0.17.0 required `libnvrtc.so.13`, so vLLM exited before loading
+the model. A CUDA tensor check passed on an A100 80GB with driver 595.71.05.
+The v2 image uses the same vLLM release's standard CUDA 13.0 image, matching its
+bundled libraries; verify CUDA 13 driver support on each assigned node.
+Published v2 digest:
+`sha256:696d375800974384d1663c64d20bb1dfef4006a61657c6a0afceb4156eb6c716`.
+
+Live v2 verification on 2026-10-28:
+
+- Ready on `g-0002.dsri.unimaas.nl`: NVIDIA H100 PCIe, 81,559 MiB total,
+  driver 595.71.05; 71,073 MiB used after initialization and the smoke request.
+- vLLM 0.32.0, PyTorch 2.13.0+cu130, TorchCodec 0.17.0+cu130, CUDA 13.0.
+- All 18 weight shards loaded; model loading used 50.13 GiB. The model revision,
+  BF16, context limit and concurrency remained as configured above.
+- Private Service smoke test passed health, model listing, and exact grounded
+  schema-constrained JSON extraction in 2.03 seconds total. This is one small
+  synthetic request, not a throughput or extraction-quality benchmark.
+- The smoke tool now accepts vLLM's empty HTTP 200 health response; empty model
+  listings/completions still fail. All 15 local tests passed.
+- Deployment was left at one ready replica, zero restarts, with no public Route.
+  The CPU gateway path and reservation end time were not verified.
 
 The cache is already prepared; the steps below also document how to reproduce
 setup. Do not rerun create commands against existing resources without inspecting
@@ -89,7 +112,7 @@ delete only the terminal image-build Job before creating it again.
 Alternatively, build locally:
 
 ```bash
-docker build -t datasight-vllm-gpu:qwen3.8-27b-v1 .
+docker build -t datasight-vllm-gpu:qwen3.8-27b-v2 .
 ```
 
 A local build does not publish the image into DSRI. Use a new custom-image tag

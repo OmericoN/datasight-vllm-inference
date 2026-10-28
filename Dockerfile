@@ -1,4 +1,4 @@
-FROM vllm/vllm-openai:v0.32.0-cu129
+FROM vllm/vllm-openai:v0.32.0
 
 ENV HF_HOME=/hf-cache
 ENV HUGGINGFACE_HUB_CACHE=/hf-cache/hub
