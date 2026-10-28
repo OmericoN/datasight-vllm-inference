@@ -55,7 +55,8 @@ Live v2 verification on 2026-10-28:
 - The smoke tool now accepts vLLM's empty HTTP 200 health response; empty model
   listings/completions still fail. All 15 local tests passed.
 - Deployment was left at one ready replica, zero restarts, with no public Route.
-  The CPU gateway path and reservation end time were not verified.
+  The CPU gateway was subsequently verified as described below. The reservation
+  end time was not verified.
 
 The cache is already prepared; the steps below also document how to reproduce
 setup. Do not rerun create commands against existing resources without inspecting
@@ -210,6 +211,16 @@ The startup probe allows approximately 30 minutes. Record actual GPU memory,
 driver, custom-image digest, model revision, and settings with test results.
 
 ## Through the CPU gateway
+
+The CPU gateway was deployed and verified on 2026-10-28 at
+[the authenticated HTTPS endpoint](https://datasight-llm-server-ub-ub-datasight.apps.dsri.unimaas.nl).
+Health, backend availability, authentication rejection, and schema-constrained
+inference passed through the gateway (1.26 seconds for the full smoke test).
+A simulated unreachable backend returned gateway health 200 and chat 503;
+the real backend URL was restored and inference passed again. The GPU stayed up.
+The gateway API key is stored in OpenShift Secret `datasight-llm-server-api`,
+key `API_KEY`; see the
+[gateway setup and client instructions](https://github.com/OmericoN/datasight-llm-server#calling-the-gateway).
 
 Configure the gateway separately with:
 
