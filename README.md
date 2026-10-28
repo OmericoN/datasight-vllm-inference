@@ -222,6 +222,10 @@ The gateway API key is stored in OpenShift Secret `datasight-llm-server-api`,
 key `API_KEY`; see the
 [gateway setup and client instructions](https://github.com/OmericoN/datasight-llm-server#calling-the-gateway).
 
+For the Python chat client, put `DATASIGHT_API_KEY=your-key` in the project-root
+`.env` file, then run `python scripts/chat.py "Your prompt"`. The `.env` file is
+ignored by Git. An existing `DATASIGHT_API_KEY` environment variable takes precedence.
+
 Configure the gateway separately with:
 
 ```text
